@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -294,5 +295,57 @@ with col2:
 st.subheader("🔮 연도별 기온 예측")
 
 selected_year = st.slider(
-    "예측할 연도를 선택하세요."
+    "예측할 연도를 선택하세요.",
+    min_value=1900,
+    max_value=2100,
+    value=2025,
+    step=1,
+)
 
+selected_x = selected_year - BASE_YEAR
+
+predicted_temperature = (
+    slope_all * selected_x + intercept_all
+)
+
+st.markdown(
+    f"""
+    <div style="
+        text-align: center;
+        padding: 30px;
+        border-radius: 15px;
+        background-color: rgba(128, 128, 128, 0.12);
+        margin-top: 15px;
+        margin-bottom: 20px;
+    ">
+        <div style="font-size: 24px;">
+            {selected_year}년 예상 연평균기온
+        </div>
+        <div style="
+            font-size: 60px;
+            font-weight: bold;
+            margin-top: 5px;
+        ">
+            {predicted_temperature:.2f} ℃
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+if selected_year < start_year or selected_year > end_year:
+    st.warning(
+        f"{selected_year}년은 회귀 직선에 사용한 관측 기간 "
+        f"({start_year}~{end_year}년) 밖의 값이므로 "
+        "전체 기간 회귀 직선을 연장한 추정값입니다."
+    )
+
+
+# --------------------------------------------------
+# 데이터 조건
+# --------------------------------------------------
+st.caption(
+    f"2025년 이후 데이터와 연평균기온 관측일이 "
+    f"{MIN_OBSERVATION_DAYS}일 미만인 해는 제외했습니다."
+)
